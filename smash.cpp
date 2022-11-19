@@ -4,6 +4,10 @@
 #include <signal.h>
 #include "Commands.h"
 #include "signals.h"
+#include <string.h>
+
+using namespace std;
+extern string prompt;
 
 int main(int argc, char* argv[]) {
     prompt = "smash> ";

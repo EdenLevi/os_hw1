@@ -53,6 +53,13 @@ class RedirectionCommand : public Command {
   //void cleanup() override;
 };
 
+class ChangePromptCommand : public BuiltInCommand {
+// TODO: Add your data members public:
+    ChangePromptCommand(const char *cmd_line);
+    virtual ~ChangePromptCommand() {}
+    void execute() override;
+};
+
 class ChangeDirCommand : public BuiltInCommand {
 public:
 // TODO: Add your data members public:
