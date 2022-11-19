@@ -2,14 +2,19 @@
 #define SMASH_COMMAND_H_
 
 #include <vector>
+#include <string>
+#include <list>
+
+using namespace std;
 
 #define COMMAND_ARGS_MAX_LENGTH (200)
 #define COMMAND_MAX_ARGS (20)
 
 class Command {
 // TODO: Add your data members
- public:
-  Command(const char* cmd_line);
+public:
+    const char* cmd_line;
+  Command(const char* cmd_line) : cmd_line(cmd_line){};
   virtual ~Command();
   virtual void execute() = 0;
   //virtual void prepare();
@@ -19,7 +24,7 @@ class Command {
 
 class BuiltInCommand : public Command {
  public:
-  BuiltInCommand(const char* cmd_line);
+  BuiltInCommand(const char* cmd_line) : Command(cmd_line) {};
   virtual ~BuiltInCommand() {}
 };
 
@@ -49,8 +54,10 @@ class RedirectionCommand : public Command {
 };
 
 class ChangeDirCommand : public BuiltInCommand {
+public:
 // TODO: Add your data members public:
-  ChangeDirCommand(const char* cmd_line, char** plastPwd);
+    static std::list<string> path_history;
+  ChangeDirCommand(const char* cmd_line); // char** plastPwd was here
   virtual ~ChangeDirCommand() {}
   void execute() override;
 };

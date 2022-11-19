@@ -8,6 +8,7 @@
 #include "Commands.h"
 
 using namespace std;
+extern string prompt;
 
 const std::string WHITESPACE = " \n\r\t\f\v";
 
@@ -77,7 +78,60 @@ void _removeBackgroundSign(char* cmd_line) {
   cmd_line[str.find_last_not_of(WHITESPACE, idx) + 1] = 0;
 }
 
-// TODO: Add your implementation for classes in Commands.h 
+// TODO: Add your implementation for classes in Commands.h
+
+void ChangePromptCommand::execute() {
+    char** args = (char **)(malloc(sizeof(char **)));
+    int i = _parseCommandLine(this->cmd_line, args);
+    if(i < 1) {
+        prompt = "smash> ";
+    }
+    else {
+        prompt = args[2];
+    }
+}
+
+void ShowPidCommand::execute() {
+    int pid = getpid();
+    if(pid == 0) {
+        //wait();
+    }
+    cout << "smash pid is " << pid << endl;
+}
+
+void GetCurrDirCommand::execute() {
+    char dir[CHAR_MAX];
+    getcwd(dir, sizeof(dir));
+    cout << dir << endl;
+}
+
+void ChangeDirCommand::execute() {
+    int result;
+    char currdir[CHAR_MAX];
+    getcwd(currdir, sizeof(currdir));
+    char** args = (char **)(malloc(sizeof(char **)));
+    int i = _parseCommandLine(this->cmd_line, args);
+    if(i >= 2) {
+        perror( "smash error: cd: too many arguments" );
+    }
+    else if (args[1] == "-") {
+        if(this->path_history.empty()) {
+            perror("smash error: cd: OLDPWD not set");
+        }
+        else {
+            result = chdir(path_history.back().c_str());
+            if(result == 0) path_history.pop_back();
+        }
+    }
+    else {
+        result = chdir(args[1]);
+    }
+    if(result != 0 ) {
+        // you have an error :(
+        perror( "smash error: cd: chdir failed" );
+    }
+    path_history.push_back(currdir);
+}
 
 SmallShell::SmallShell() {
 // TODO: add your implementation
@@ -112,9 +166,11 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
 }
 
 void SmallShell::executeCommand(const char *cmd_line) {
+
   // TODO: Add your implementation here
   // for example:
   // Command* cmd = CreateCommand(cmd_line);
   // cmd->execute();
   // Please note that you must fork smash process for some commands (e.g., external commands....)
+
 }
