@@ -6,9 +6,11 @@
 #include <sys/wait.h>
 #include <iomanip>
 #include "Commands.h"
+#define CHAR_MAX 255
 
 using namespace std;
-extern string prompt;
+
+
 
 const std::string WHITESPACE = " \n\r\t\f\v";
 
@@ -81,14 +83,15 @@ void _removeBackgroundSign(char* cmd_line) {
 // TODO: Add your implementation for classes in Commands.h
 
 void ChangePromptCommand::execute() {
-    char** args = (char **)(malloc(sizeof(char **)));
+    char** args = new char* [COMMAND_MAX_ARGS];
     int i = _parseCommandLine(this->cmd_line, args);
-    if(i < 1) {
-        prompt = "smash> ";
+    if(i >= 1) {
+        Smash::prompt = strcat(args[1] ,">");
     }
-    else {
-        prompt = args[2];
+    for(int j=0;j<i;j++){
+        free(args[j]);
     }
+   delete [] args;
 }
 
 void ShowPidCommand::execute() {
@@ -106,21 +109,23 @@ void GetCurrDirCommand::execute() {
 }
 
 void ChangeDirCommand::execute() {
+
     int result;
     char currdir[CHAR_MAX];
     getcwd(currdir, sizeof(currdir));
-    char** args = (char **)(malloc(sizeof(char **)));
+    char** args = new char* [COMMAND_MAX_ARGS];
     int i = _parseCommandLine(this->cmd_line, args);
-    if(i >= 2) {
+
+    if(i > 2) {
         perror( "smash error: cd: too many arguments" );
     }
-    else if (args[1] == "-") {
-        if(this->path_history.empty()) {
+    else if (strcmp(args[1], "-") == 0) {
+        if(ChangeDirCommand::path_history.empty()) {
             perror("smash error: cd: OLDPWD not set");
         }
         else {
-            result = chdir(path_history.back().c_str());
-            if(result == 0) path_history.pop_back();
+            result = chdir(ChangeDirCommand::path_history.back().c_str());
+            if(result == 0) ChangeDirCommand::path_history.pop_back();
         }
     }
     else {
@@ -130,7 +135,12 @@ void ChangeDirCommand::execute() {
         // you have an error :(
         perror( "smash error: cd: chdir failed" );
     }
-    path_history.push_back(currdir);
+    ChangeDirCommand::path_history.push_back(currdir);
+    for(int j=0;j<i;j++){
+        free(args[j]);
+    }
+    delete [] args;
+
 }
 
 SmallShell::SmallShell() {
@@ -146,7 +156,7 @@ SmallShell::~SmallShell() {
 */
 Command * SmallShell::CreateCommand(const char* cmd_line) {
 	// For example:
-/*
+
   string cmd_s = _trim(string(cmd_line));
   string firstWord = cmd_s.substr(0, cmd_s.find_first_of(" \n"));
 
@@ -156,12 +166,16 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   else if (firstWord.compare("showpid") == 0) {
     return new ShowPidCommand(cmd_line);
   }
-  else if ...
-  .....
-  else {
-    return new ExternalCommand(cmd_line);
+  else if (firstWord.compare("chprompt") == 0) {
+      return new ChangePromptCommand(cmd_line);
   }
-  */
+  else if (firstWord.compare("cd") == 0) {
+      return new ChangeDirCommand(cmd_line);
+  }
+  else {
+   // return new ExternalCommand(cmd_line);
+  }
+
   return nullptr;
 }
 
@@ -169,8 +183,16 @@ void SmallShell::executeCommand(const char *cmd_line) {
 
   // TODO: Add your implementation here
   // for example:
-  // Command* cmd = CreateCommand(cmd_line);
-  // cmd->execute();
+   Command* cmd = CreateCommand(cmd_line);
+   cmd->execute();
   // Please note that you must fork smash process for some commands (e.g., external commands....)
 
 }
+
+Command::~Command()=default;
+BuiltInCommand::BuiltInCommand(const char* cmd_line) : Command(cmd_line) {};
+Command::Command(const char* cmd_line) : cmd_line(cmd_line){};
+ChangePromptCommand::ChangePromptCommand(const char *cmd_line): BuiltInCommand(cmd_line) {};
+ChangeDirCommand::ChangeDirCommand(const char* cmd_line): BuiltInCommand(cmd_line) {};
+GetCurrDirCommand::GetCurrDirCommand(const char* cmd_line): BuiltInCommand(cmd_line) {};
+ShowPidCommand::ShowPidCommand(const char* cmd_line): BuiltInCommand(cmd_line) {};

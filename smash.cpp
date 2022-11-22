@@ -7,10 +7,11 @@
 #include <string.h>
 
 using namespace std;
-extern string prompt;
+
+string Smash::prompt="smash>";
+list<string> ChangeDirCommand::path_history;
 
 int main(int argc, char* argv[]) {
-    prompt = "smash> ";
 
     if(signal(SIGTSTP , ctrlZHandler)==SIG_ERR) {
         perror("smash error: failed to set ctrl-Z handler");
@@ -24,7 +25,7 @@ int main(int argc, char* argv[]) {
     SmallShell& smash = SmallShell::getInstance();
     while(true) {
         //std::cout << "smash> ";
-        std::cout << prompt;
+        std::cout << Smash::prompt;
         std::string cmd_line;
         std::getline(std::cin, cmd_line);
         smash.executeCommand(cmd_line.c_str());

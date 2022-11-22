@@ -7,14 +7,20 @@
 
 using namespace std;
 
+
 #define COMMAND_ARGS_MAX_LENGTH (200)
 #define COMMAND_MAX_ARGS (20)
+
+class Smash {
+public:
+    static string prompt;
+};
 
 class Command {
 // TODO: Add your data members
 public:
     const char* cmd_line;
-  Command(const char* cmd_line) : cmd_line(cmd_line){};
+  explicit Command(const char* cmd_line);
   virtual ~Command();
   virtual void execute() = 0;
   //virtual void prepare();
@@ -24,13 +30,15 @@ public:
 
 class BuiltInCommand : public Command {
  public:
-  BuiltInCommand(const char* cmd_line) : Command(cmd_line) {};
-  virtual ~BuiltInCommand() {}
+  explicit BuiltInCommand(const char* cmd_line);
+  virtual ~BuiltInCommand() {
+
+  }
 };
 
 class ExternalCommand : public Command {
  public:
-  ExternalCommand(const char* cmd_line);
+  explicit ExternalCommand(const char* cmd_line);
   virtual ~ExternalCommand() {}
   void execute() override;
 };
@@ -55,7 +63,8 @@ class RedirectionCommand : public Command {
 
 class ChangePromptCommand : public BuiltInCommand {
 // TODO: Add your data members public:
-    ChangePromptCommand(const char *cmd_line);
+public:
+    explicit ChangePromptCommand(const char *cmd_line);
     virtual ~ChangePromptCommand() {}
     void execute() override;
 };
@@ -64,21 +73,21 @@ class ChangeDirCommand : public BuiltInCommand {
 public:
 // TODO: Add your data members public:
     static std::list<string> path_history;
-  ChangeDirCommand(const char* cmd_line); // char** plastPwd was here
+  explicit ChangeDirCommand(const char* cmd_line); // char** plastPwd was here
   virtual ~ChangeDirCommand() {}
   void execute() override;
 };
 
 class GetCurrDirCommand : public BuiltInCommand {
  public:
-  GetCurrDirCommand(const char* cmd_line);
+  explicit GetCurrDirCommand(const char* cmd_line);
   virtual ~GetCurrDirCommand() {}
   void execute() override;
 };
 
 class ShowPidCommand : public BuiltInCommand {
  public:
-  ShowPidCommand(const char* cmd_line);
+  explicit ShowPidCommand(const char* cmd_line);
   virtual ~ShowPidCommand() {}
   void execute() override;
 };
