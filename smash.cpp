@@ -8,24 +8,23 @@
 
 using namespace std;
 
-string Smash::prompt="smash>";
 list<string> ChangeDirCommand::path_history;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
+    SmallShell::prompt = "smash> "; // default value
 
-    if(signal(SIGTSTP , ctrlZHandler)==SIG_ERR) {
+    if (signal(SIGTSTP, ctrlZHandler) == SIG_ERR) {
         perror("smash error: failed to set ctrl-Z handler");
     }
-    if(signal(SIGINT , ctrlCHandler)==SIG_ERR) {
+    if (signal(SIGINT, ctrlCHandler) == SIG_ERR) {
         perror("smash error: failed to set ctrl-C handler");
     }
 
     //TODO: setup sig alarm handler
 
-    SmallShell& smash = SmallShell::getInstance();
-    while(true) {
-        //std::cout << "smash> ";
-        std::cout << Smash::prompt;
+    SmallShell &smash = SmallShell::getInstance();
+    while (true) {
+        std::cout << SmallShell::prompt;
         std::string cmd_line;
         std::getline(std::cin, cmd_line);
         smash.executeCommand(cmd_line.c_str());

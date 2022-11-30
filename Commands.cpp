@@ -10,7 +10,7 @@
 #define CHAR_MAX 255
 
 using namespace std;
-
+string SmallShell::prompt;
 
 const std::string WHITESPACE = " \n\r\t\f\v";
 
@@ -82,9 +82,14 @@ void _removeBackgroundSign(char *cmd_line) {
 void ChangePromptCommand::execute() {
     char **args = new char *[COMMAND_MAX_ARGS];
     int i = _parseCommandLine(this->cmd_line, args);
-    if (i >= 1) {
-        Smash::prompt = strcat(args[1], ">");
+
+    if (i >= 2) {  // usage: "chprompt <prompt>"
+        SmallShell::prompt = strcat(args[1], "> ");
+    } else { // usage: "chprompt"
+        SmallShell::prompt = "smash> ";
     }
+    cout << "i: " << i << endl;
+
     for (int j = 0; j < i; j++) {
         free(args[j]);
     }
@@ -121,7 +126,7 @@ void ChangeDirCommand::execute() {
                 result = chdir(ChangeDirCommand::path_history.back().c_str());
                 if (result == 0) ChangeDirCommand::path_history.pop_back();
             }
-        } else  {
+        } else {
             result = chdir(args[1]); // proper usage (cd <path>)
             ChangeDirCommand::path_history.push_back(currdir);
         }
@@ -178,7 +183,7 @@ void SmallShell::executeCommand(const char *cmd_line) {
     // TODO: Add your implementation here
     // for example:
     Command *cmd = CreateCommand(cmd_line);
-    if(cmd != nullptr) cmd->execute();
+    if (cmd != nullptr) cmd->execute();
     // Please note that you musCreateCommandt fork smash process for some commands (e.g., external commands....)
 
 }
