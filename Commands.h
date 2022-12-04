@@ -124,7 +124,7 @@ class JobsList;
 class QuitCommand : public BuiltInCommand {
 // TODO: Add your data members
 public:
-    QuitCommand(const char *cmd_line, JobsList *jobs);
+    QuitCommand(const char *cmd_line);
 
     virtual ~QuitCommand() {}
 
@@ -159,28 +159,37 @@ public:
 
     //~JobsList();
 
-    void addJob(Command *cmd, bool isStopped = false);
+    static void addJob(Command *cmd,int pid, bool isStopped = false);
 
-    void printJobsList();
+    static void addTime(Command *cmd,int pid);
 
-    void killAllJobs();
+    static JobsList::JobEntry* getFirstTime();
 
-    void removeFinishedJobs();
+    static void printJobsList();
 
-    JobEntry *getJobById(int jobId);
+    static void killAllJobs();
 
-    void removeJobById(int jobId);
+    static void removeFinishedJobs();
 
-    JobEntry *getLastJob(int *lastJobId);
+    static void removeFinishedTimes();
 
-    JobEntry *getLastStoppedJob(int *jobId);
+    static JobEntry *getJobById(int jobId);
+
+    static void removeJobById(int jobId);
+
+    static void removeJobByIdDeep(int jobId);
+
+    static JobEntry *getLastJob(int *lastJobId);
+
+    static JobEntry *getLastStoppedJob(int *jobId);
     // TODO: Add extra methods or modify exisitng ones as needed
+    static void printKillJobs();
 };
 
 class JobsCommand : public BuiltInCommand {
     // TODO: Add your data members
 public:
-    JobsCommand(const char *cmd_line, JobsList *jobs);
+    JobsCommand(const char *cmd_line);
 
     virtual ~JobsCommand() {}
 
@@ -256,7 +265,7 @@ public:
 
     ~SmallShell();
 
-    void executeCommand(const char *cmd_line);
+    static void executeCommand(const char *cmd_line);
     // TODO: add extra methods as needed
 };
 

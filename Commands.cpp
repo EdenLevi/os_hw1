@@ -6,6 +6,8 @@
 #include <sys/wait.h>
 #include <iomanip>
 #include "Commands.h"
+#include <fcntl.h>
+#include <fstream>
 
 #define CHAR_MAX 255
 

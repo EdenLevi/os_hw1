@@ -25,13 +25,20 @@ int main(int argc, char *argv[]) {
 
 
     //TODO: setup sig alarm handler
+    struct sigaction a;
+    a.sa_handler = alarmHandler;
+    sigemptyset(&a.sa_mask);
+    a.sa_flags = SA_RESTART;
+    if (sigaction(SIGALRM, &a, nullptr) == -1) {
+        perror("smash error: failed to set alarm handler");
+    }
 
     while (true) {
         setbuf(stdout, NULL);
         std::cout << SmallShell::prompt;
         std::string cmd_line;
         std::getline(std::cin, cmd_line);
-        smash.executeCommand(cmd_line.c_str());
+        SmallShell::executeCommand(cmd_line.c_str());
     }
     return 0;
 }
