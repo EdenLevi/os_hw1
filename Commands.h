@@ -14,7 +14,11 @@ using namespace std;
 class Command {
 // TODO: Add your data members
 public:
-    const char *cmd_line;
+    char *cmd_line_new;
+    char *cmd_line;
+    bool is_bg;
+    char** args;
+    int arg_size;
 
     explicit Command(const char *cmd_line);
 
@@ -76,6 +80,16 @@ public:
     void execute() override;
 };
 
+class FareCommand : public BuiltInCommand {
+// TODO: Add your data members public:
+public:
+    explicit FareCommand(const char *cmd_line);
+
+    virtual ~FareCommand() {}
+
+    void execute() override;
+};
+
 class ChangeDirCommand : public BuiltInCommand {
 public:
 // TODO: Add your data members public:
@@ -117,17 +131,33 @@ public:
     void execute() override;
 };
 
-
 class JobsList {
 public:
     class JobEntry {
         // TODO: Add your data members
+    public:
+        int job_id;
+        Command* command;
+        int process_id;
+        bool stopped;
+        time_t time_s;
+
+        JobEntry(int job_id, Command* command, int process_id, bool stopped,time_t time_s = time(0)) : job_id(job_id),
+                                                                                          command(command),
+                                                                                          process_id(process_id),
+                                                                                          stopped(stopped),
+                                                                                          time_s(time_s) {};
+
+        ~JobEntry();
     };
+
+    static vector<JobEntry *> jobs;
+    static vector<JobEntry *> times;
     // TODO: Add your data members
 public:
-    JobsList();
+    //JobsList();
 
-    ~JobsList();
+    //~JobsList();
 
     void addJob(Command *cmd, bool isStopped = false);
 
@@ -160,7 +190,7 @@ public:
 class ForegroundCommand : public BuiltInCommand {
     // TODO: Add your data members
 public:
-    ForegroundCommand(const char *cmd_line, JobsList *jobs);
+    ForegroundCommand(const char *cmd_line);
 
     virtual ~ForegroundCommand() {}
 
@@ -170,14 +200,14 @@ public:
 class BackgroundCommand : public BuiltInCommand {
     // TODO: Add your data members
 public:
-    BackgroundCommand(const char *cmd_line, JobsList *jobs);
+    BackgroundCommand(const char *cmd_line);
 
     virtual ~BackgroundCommand() {}
 
     void execute() override;
 };
 
-class TimeoutCommand : public BuiltInCommand {
+class TimeoutCommand : public Command {
 /* Optional */
 // TODO: Add your data members
 public:
@@ -188,16 +218,6 @@ public:
     void execute() override;
 };
 
-class FareCommand : public BuiltInCommand {
-    /* Optional */
-    // TODO: Add your data members
-public:
-    FareCommand(const char *cmd_line);
-
-    virtual ~FareCommand() {}
-
-    void execute() override;
-};
 
 class SetcoreCommand : public BuiltInCommand {
     /* Optional */
@@ -228,17 +248,11 @@ private:
 
 public:
     static string prompt;
-
-    Command *CreateCommand(const char *cmd_line);
+    static JobsList::JobEntry * cur_job;
+    static Command *CreateCommand(const char *cmd_line);
 
     SmallShell(SmallShell const &) = delete; // disable copy ctor
     void operator=(SmallShell const &) = delete; // disable = operator
-    static SmallShell &getInstance() // make SmallShell singleton
-    {
-        static SmallShell instance; // Guaranteed to be destroyed.
-        // Instantiated on first use.
-        return instance;
-    }
 
     ~SmallShell();
 
